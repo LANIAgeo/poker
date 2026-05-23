@@ -571,7 +571,7 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 .card-back::after {
-  content: '\6B66';
+  content: '武';
   font-family: serif;
   font-size: clamp(16px, 3vw, 24px);
   color: var(--theme-accent-primary);
@@ -1066,7 +1066,6 @@ export default function PokerApp() {
       }
     } else {
       const numAI = 3;
-      opponents = AI_NAMES.slice(0, numAI).map((name) => ({
       opponents = AI_NAMES.slice(0, numAI).map((name) => ({
         name,
         chips: 800 + Math.floor(Math.random() * 400),
@@ -1653,5 +1652,4 @@ export default function PokerApp() {
       )}
     </div>
   );
-}
 }

@@ -1,0 +1,26 @@
+/* ═══════════════════════════════════════════════════════════
+   POKER SKIN — Sakura (pink/white)
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --theme-bg-primary: #fff5f7;
+  --theme-bg-secondary: #ffffff;
+  --theme-bg-tertiary: #fce4ec;
+  --theme-card-bg: #ffffff;
+  --theme-text-primary: #1a1a2e;
+  --theme-text-secondary: #4a4a6a;
+  --theme-text-muted: #8a8a9a;
+  --theme-accent-primary: #f472b6;
+  --theme-accent-secondary: #ec4899;
+  --theme-border-primary: rgba(244,114,182,0.25);
+  --theme-border-secondary: rgba(244,114,182,0.15);
+
+  --poker-felt: #e8f5e9;
+  --poker-felt-light: #f1f8e9;
+  --poker-accent-deep: #db2777;
+  --poker-accent-dim: #ec4899;
+  --poker-circuit: rgba(244,114,182,0.08);
+  --poker-gold: #f59e0b;
+  --poker-card-red: #ec4899;
+  --poker-card-black: #1a1a2e;
+}

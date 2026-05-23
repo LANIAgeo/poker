@@ -1,0 +1,26 @@
+/* ═══════════════════════════════════════════════════════════
+   POKER SKIN — Samurai (gold/crimson on void-black)
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --theme-bg-primary: #0a0000;
+  --theme-bg-secondary: #110300;
+  --theme-bg-tertiary: #1a0a00;
+  --theme-card-bg: #110300;
+  --theme-text-primary: #ffe8d0;
+  --theme-text-secondary: #d4b080;
+  --theme-text-muted: #b8944f;
+  --theme-accent-primary: #f59e0b;
+  --theme-accent-secondary: #991b1b;
+  --theme-border-primary: rgba(245,158,11,0.3);
+  --theme-border-secondary: rgba(245,158,11,0.15);
+
+  --poker-felt: #0d1f15;
+  --poker-felt-light: #122e1f;
+  --poker-accent-deep: #7f1d1d;
+  --poker-accent-dim: #991b1b;
+  --poker-circuit: rgba(245,158,11,0.10);
+  --poker-gold: #f59e0b;
+  --poker-card-red: #dc2626;
+  --poker-card-black: #1a0a00;
+}

@@ -1,0 +1,56 @@
+/* ═══════════════════════════════════════════════════════════
+   POKER DEFAULT SKIN — "RONIN" (red/black)
+   ═══════════════════════════════════════════════════════════
+
+   This is the fallback skin loaded by default. It maps the
+   brainstorm skin system variable contract to the poker UI.
+
+   To create a new poker skin, copy this file and change the
+   :root variables. Override --poker-* vars if you want to
+   change table felt, card backs, or chip colors.
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Theme (standard brainstorm contract) ── */
+  --theme-bg-primary: #0a0a0a;
+  --theme-bg-secondary: #0f0f0f;
+  --theme-bg-tertiary: #161616;
+  --theme-card-bg: #111111;
+  --theme-text-primary: #f5f5f5;
+  --theme-text-secondary: #a3a3a3;
+  --theme-text-muted: #525252;
+  --theme-accent-primary: #dc2626;
+  --theme-accent-secondary: #ef4444;
+  --theme-border-primary: rgba(220,38,38,0.3);
+  --theme-border-secondary: rgba(220,38,38,0.15);
+
+  /* ── Poker-specific ── */
+  --poker-felt: #0d3320;
+  --poker-felt-light: #15503a;
+  --poker-accent-deep: #991b1b;
+  --poker-accent-dim: #7f1d1d;
+  --poker-circuit: rgba(220,38,38,0.15);
+  --poker-gold: #f59e0b;
+  --poker-card-red: #dc2626;
+  --poker-card-black: #1a1a1a;
+
+  /* ── shadcn HSL compat ── */
+  --background: 0 0% 4%;
+  --foreground: 0 0% 96%;
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 96%;
+  --primary: 0 84% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 8%;
+  --secondary-foreground: 0 0% 96%;
+  --muted: 0 0% 8%;
+  --muted-foreground: 0 0% 32%;
+  --accent: 0 84% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 30% 20%;
+  --input: 0 30% 20%;
+  --ring: 0 84% 60%;
+  --radius: 0.3rem;
+}

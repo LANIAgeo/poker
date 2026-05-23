@@ -1,0 +1,26 @@
+/* ═══════════════════════════════════════════════════════════
+   POKER SKIN — Zen (cream/green)
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --theme-bg-primary: #f5f0e8;
+  --theme-bg-secondary: #faf7f2;
+  --theme-bg-tertiary: #ede6d8;
+  --theme-card-bg: #faf7f2;
+  --theme-text-primary: #2d1f0a;
+  --theme-text-secondary: #3d3d3d;
+  --theme-text-muted: #7a7265;
+  --theme-accent-primary: #15803d;
+  --theme-accent-secondary: #166534;
+  --theme-border-primary: #d4c9b4;
+  --theme-border-secondary: #e0d7c7;
+
+  --poker-felt: #d9e8d0;
+  --poker-felt-light: #e6f0dd;
+  --poker-accent-deep: #14532d;
+  --poker-accent-dim: #15803d;
+  --poker-circuit: rgba(21,128,61,0.06);
+  --poker-gold: #b45309;
+  --poker-card-red: #dc2626;
+  --poker-card-black: #2d1f0a;
+}

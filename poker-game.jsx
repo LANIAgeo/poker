@@ -85,34 +85,79 @@ function compareTiebreaker(a, b) {
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   BR@INSTORM SKIN SYSTEM — Poker variable contract
+   ═══════════════════════════════════════════════════════════════════════════
+
+   CSS variables follow the standard brainstorm skin system naming convention.
+   When loaded inside the platform, the active skin CSS overrides these
+   :root defaults with its own palette.
+
+   When standalone (no skin loaded), the :root values below provide the
+   default red/black "RONIN" poker theme.
+
+   Poker-specific variables (--poker-*) are additional — they are NOT
+   overridden by general skins. A dedicated poker skin can target them
+   separately (e.g. html[data-skin="terminal"] { --poker-felt: ... }).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 :root {
-  --bg-dark: #0a0a0a;
-  --bg-card: #111111;
-  --red-primary: #dc2626;
-  --red-glow: #ef4444;
-  --red-deep: #991b1b;
-  --red-dim: #7f1d1d;
-  --gold: #f59e0b;
-  --text-primary: #f5f5f5;
-  --text-secondary: #a3a3a3;
-  --text-dim: #525252;
-  --green-felt: #0d3320;
-  --green-felt-light: #15503a;
-  --circuit-red: rgba(220, 38, 38, 0.15);
+  /* ── Theme variables (standard brainstorm contract) ── */
+  --theme-bg-primary: #0a0a0a;
+  --theme-bg-secondary: #0f0f0f;
+  --theme-bg-tertiary: #161616;
+  --theme-card-bg: #111111;
+  --theme-text-primary: #f5f5f5;
+  --theme-text-secondary: #a3a3a3;
+  --theme-text-muted: #525252;
+  --theme-accent-primary: #dc2626;
+  --theme-accent-secondary: #ef4444;
+  --theme-border-primary: rgba(220,38,38,0.3);
+  --theme-border-secondary: rgba(220,38,38,0.15);
+
+  /* ── Poker-specific variables ── */
+  --poker-felt: #0d3320;
+  --poker-felt-light: #15503a;
+  --poker-accent-deep: #991b1b;
+  --poker-accent-dim: #7f1d1d;
+  --poker-circuit: rgba(220,38,38,0.15);
+  --poker-gold: #f59e0b;
+  --poker-card-red: #dc2626;
+  --poker-card-black: #1a1a1a;
+
+  /* ── shadcn HSL compat (for Tailwind hosts that embed poker) ── */
+  --background: 0 0% 4%;
+  --foreground: 0 0% 96%;
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 96%;
+  --primary: 0 84% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 8%;
+  --secondary-foreground: 0 0% 96%;
+  --muted: 0 0% 8%;
+  --muted-foreground: 0 0% 32%;
+  --accent: 0 84% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 30% 20%;
+  --input: 0 30% 20%;
+  --ring: 0 84% 60%;
+  --radius: 0.3rem;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
 
 body {
-  background: var(--bg-dark);
-  color: var(--text-primary);
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
   font-family: 'Rajdhani', sans-serif;
   overflow-x: hidden;
 }
 
 .app-container {
   min-height: 100vh;
-  background: var(--bg-dark);
+  background: var(--theme-bg-primary);
   position: relative;
 }
 
@@ -121,9 +166,9 @@ body {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background:
-    linear-gradient(90deg, transparent 49.5%, var(--circuit-red) 49.5%, var(--circuit-red) 50.5%, transparent 50.5%) 0 0 / 60px 60px,
-    linear-gradient(0deg, transparent 49.5%, var(--circuit-red) 49.5%, var(--circuit-red) 50.5%, transparent 50.5%) 0 0 / 60px 60px,
-    radial-gradient(circle 2px, rgba(220,38,38,0.3) 100%, transparent 100%) 0 0 / 60px 60px;
+    linear-gradient(90deg, transparent 49.5%, var(--poker-circuit) 49.5%, var(--poker-circuit) 50.5%, transparent 50.5%) 0 0 / 60px 60px,
+    linear-gradient(0deg, transparent 49.5%, var(--poker-circuit) 49.5%, var(--poker-circuit) 50.5%, transparent 50.5%) 0 0 / 60px 60px,
+    radial-gradient(circle 2px, var(--theme-accent-primary) 100%, transparent 100%) 0 0 / 60px 60px;
   pointer-events: none;
   z-index: 0;
   opacity: 0.4;
@@ -145,17 +190,17 @@ body {
   font-family: 'Orbitron', sans-serif;
   font-size: clamp(28px, 6vw, 52px);
   font-weight: 900;
-  color: var(--text-primary);
-  text-shadow: 0 0 30px var(--red-primary), 0 0 60px rgba(220,38,38,0.4);
+  color: var(--theme-text-primary);
+  text-shadow: 0 0 30px var(--theme-accent-primary), 0 0 60px var(--theme-accent-secondary);
   letter-spacing: 4px;
   margin-bottom: 8px;
 }
-.login-logo span { color: var(--red-primary); }
+.login-logo span { color: var(--theme-accent-primary); }
 
 .login-subtitle {
   font-family: 'Rajdhani', sans-serif;
   font-size: clamp(12px, 2.5vw, 16px);
-  color: var(--red-primary);
+  color: var(--theme-accent-primary);
   letter-spacing: 6px;
   text-transform: uppercase;
   margin-bottom: 48px;
@@ -164,7 +209,7 @@ body {
 
 .login-box {
   background: linear-gradient(135deg, rgba(17,17,17,0.95), rgba(30,10,10,0.95));
-  border: 1px solid var(--red-dim);
+  border: 1px solid var(--theme-border-primary);
   border-radius: 2px;
   padding: 40px;
   width: 100%;
@@ -177,7 +222,7 @@ body {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--red-primary), transparent);
+  background: linear-gradient(90deg, transparent, var(--theme-accent-primary), transparent);
 }
 
 .login-box h2 {
@@ -185,7 +230,7 @@ body {
   font-size: 14px;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: var(--red-primary);
+  color: var(--theme-accent-primary);
   margin-bottom: 24px;
 }
 
@@ -193,25 +238,25 @@ body {
   width: 100%;
   padding: 14px 16px;
   background: rgba(0,0,0,0.6);
-  border: 1px solid var(--red-dim);
+  border: 1px solid var(--theme-border-primary);
   border-radius: 2px;
-  color: var(--text-primary);
+  color: var(--theme-text-primary);
   font-family: 'Share Tech Mono', monospace;
   font-size: 14px;
   margin-bottom: 16px;
   outline: none;
   transition: border-color 0.3s;
 }
-.login-input:focus { border-color: var(--red-primary); box-shadow: 0 0 10px rgba(220,38,38,0.2); }
-.login-input::placeholder { color: var(--text-dim); }
+.login-input:focus { border-color: var(--theme-accent-primary); box-shadow: 0 0 10px rgba(220,38,38,0.2); }
+.login-input::placeholder { color: var(--theme-text-muted); }
 
 .login-btn {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, var(--red-deep), var(--red-primary));
-  border: 1px solid var(--red-primary);
+  background: linear-gradient(135deg, var(--poker-accent-deep), var(--theme-accent-primary));
+  border: 1px solid var(--theme-accent-primary);
   border-radius: 2px;
-  color: var(--text-primary);
+  color: var(--theme-text-primary);
   font-family: 'Orbitron', sans-serif;
   font-size: 13px;
   letter-spacing: 3px;
@@ -230,8 +275,8 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
-  background: rgba(10,10,10,0.95);
-  border-bottom: 1px solid var(--red-dim);
+  background: var(--theme-bg-primary);
+  border-bottom: 1px solid var(--theme-border-primary);
   position: relative;
   z-index: 10;
   flex-wrap: wrap;
@@ -241,10 +286,10 @@ body {
   font-family: 'Orbitron', sans-serif;
   font-size: clamp(14px, 3vw, 20px);
   font-weight: 800;
-  color: var(--text-primary);
+  color: var(--theme-text-primary);
   letter-spacing: 2px;
 }
-.nav-brand span { color: var(--red-primary); }
+.nav-brand span { color: var(--theme-accent-primary); }
 
 .nav-tabs {
   display: flex;
@@ -255,7 +300,7 @@ body {
   background: transparent;
   border: 1px solid transparent;
   border-radius: 2px;
-  color: var(--text-secondary);
+  color: var(--theme-text-secondary);
   font-family: 'Rajdhani', sans-serif;
   font-size: 13px;
   font-weight: 600;
@@ -264,10 +309,10 @@ body {
   cursor: pointer;
   transition: all 0.3s;
 }
-.nav-tab:hover { color: var(--red-primary); }
+.nav-tab:hover { color: var(--theme-accent-primary); }
 .nav-tab.active {
-  color: var(--red-primary);
-  border-color: var(--red-dim);
+  color: var(--theme-accent-primary);
+  border-color: var(--theme-border-primary);
   background: rgba(220,38,38,0.1);
 }
 
@@ -279,12 +324,12 @@ body {
 .nav-chips {
   font-family: 'Share Tech Mono', monospace;
   font-size: 14px;
-  color: var(--gold);
+  color: var(--poker-gold);
 }
 .nav-email {
   font-family: 'Share Tech Mono', monospace;
   font-size: 11px;
-  color: var(--text-dim);
+  color: var(--theme-text-muted);
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -293,15 +338,15 @@ body {
 .nav-logout {
   padding: 6px 12px;
   background: transparent;
-  border: 1px solid var(--red-dim);
+  border: 1px solid var(--theme-border-primary);
   border-radius: 2px;
-  color: var(--text-dim);
+  color: var(--theme-text-muted);
   font-size: 11px;
   font-family: 'Rajdhani', sans-serif;
   cursor: pointer;
   transition: all 0.3s;
 }
-.nav-logout:hover { color: var(--red-primary); border-color: var(--red-primary); }
+.nav-logout:hover { color: var(--theme-accent-primary); border-color: var(--theme-accent-primary); }
 
 /* ─── TABLE ─── */
 .game-area {
@@ -317,8 +362,8 @@ body {
 .poker-table {
   width: 100%;
   max-width: 900px;
-  background: radial-gradient(ellipse at center, var(--green-felt-light), var(--green-felt), #091a12);
-  border: 3px solid var(--red-dim);
+  background: radial-gradient(ellipse at center, var(--poker-felt-light), var(--poker-felt), #091a12);
+  border: 3px solid var(--theme-border-primary);
   border-radius: 180px;
   padding: clamp(20px, 4vw, 40px) clamp(16px, 3vw, 30px);
   position: relative;
@@ -329,7 +374,7 @@ body {
   content: '';
   position: absolute;
   top: 6px; left: 6px; right: 6px; bottom: 6px;
-  border: 1px solid rgba(220,38,38,0.2);
+  border: 1px solid var(--theme-border-secondary);
   border-radius: 174px;
   pointer-events: none;
 }
@@ -343,7 +388,7 @@ body {
   font-family: 'Orbitron', sans-serif;
   font-size: 10px;
   letter-spacing: 3px;
-  color: rgba(255,255,255,0.3);
+  color: var(--theme-text-muted);
   text-transform: uppercase;
   margin-bottom: 8px;
 }
@@ -363,13 +408,13 @@ body {
   font-family: 'Orbitron', sans-serif;
   font-size: clamp(18px, 4vw, 28px);
   font-weight: 700;
-  color: var(--gold);
+  color: var(--poker-gold);
   text-shadow: 0 0 15px rgba(245,158,11,0.4);
 }
 .pot-label {
   font-size: 10px;
   letter-spacing: 3px;
-  color: var(--text-dim);
+  color: var(--theme-text-muted);
   text-transform: uppercase;
 }
 
@@ -388,16 +433,16 @@ body {
 .ai-name {
   font-family: 'Share Tech Mono', monospace;
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--theme-text-secondary);
   margin-bottom: 4px;
   white-space: nowrap;
 }
-.ai-name.folded { color: var(--text-dim); text-decoration: line-through; }
-.ai-name.active-player { color: var(--red-primary); }
+.ai-name.folded { color: var(--theme-text-muted); text-decoration: line-through; }
+.ai-name.active-player { color: var(--theme-accent-primary); }
 .ai-chips-display {
   font-family: 'Share Tech Mono', monospace;
   font-size: 10px;
-  color: var(--gold);
+  color: var(--poker-gold);
   opacity: 0.7;
 }
 .ai-cards {
@@ -409,13 +454,13 @@ body {
 .ai-bet-amount {
   font-family: 'Share Tech Mono', monospace;
   font-size: 10px;
-  color: var(--red-primary);
+  color: var(--theme-accent-primary);
   margin-top: 2px;
 }
 .ai-hand-result {
   font-family: 'Rajdhani', sans-serif;
   font-size: 10px;
-  color: var(--gold);
+  color: var(--poker-gold);
   margin-top: 2px;
   font-weight: 600;
 }
@@ -425,7 +470,7 @@ body {
   text-align: center;
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid rgba(220,38,38,0.15);
+  border-top: 1px solid var(--theme-border-secondary);
 }
 .player-hand {
   display: flex;
@@ -436,7 +481,7 @@ body {
 .player-hand-name {
   font-family: 'Orbitron', sans-serif;
   font-size: 12px;
-  color: var(--gold);
+  color: var(--poker-gold);
   letter-spacing: 2px;
   margin-bottom: 4px;
 }
@@ -450,7 +495,7 @@ body {
 .player-chip-count {
   font-family: 'Orbitron', sans-serif;
   font-size: 16px;
-  color: var(--gold);
+  color: var(--poker-gold);
 }
 
 /* Cards */
@@ -480,19 +525,20 @@ body {
   font-size: clamp(12px, 2.5vw, 18px);
   line-height: 1;
 }
-.card-face.red { color: var(--red-primary); }
-.card-face.black { color: #1a1a1a; }
+.card-face.red { color: var(--poker-card-red); }
+.card-face.black { color: var(--poker-card-black); }
 
 .card-back {
-  background: linear-gradient(135deg, var(--red-deep), #1a0505);
-  border: 1px solid var(--red-dim);
+  background: linear-gradient(135deg, var(--poker-accent-deep), #1a0505);
+  border: 1px solid var(--theme-border-primary);
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 .card-back::after {
-  content: '武';
+  content: '\6B66';
   font-family: serif;
   font-size: clamp(16px, 3vw, 24px);
-  color: rgba(220,38,38,0.3);
+  color: var(--theme-accent-primary);
+  opacity: 0.3;
 }
 
 .card-small {
@@ -532,7 +578,7 @@ body {
 .btn-fold {
   background: rgba(80,80,80,0.3);
   border-color: #555;
-  color: var(--text-secondary);
+  color: var(--theme-text-secondary);
 }
 .btn-fold:hover:not(:disabled) { background: rgba(80,80,80,0.5); }
 
@@ -552,15 +598,15 @@ body {
 
 .btn-raise {
   background: rgba(120,20,20,0.4);
-  border-color: var(--red-primary);
-  color: var(--red-glow);
+  border-color: var(--theme-accent-primary);
+  color: var(--theme-accent-secondary);
 }
 .btn-raise:hover:not(:disabled) { background: rgba(120,20,20,0.6); box-shadow: 0 0 12px rgba(220,38,38,0.3); }
 
 .btn-allin {
-  background: linear-gradient(135deg, var(--red-deep), #7f1d1d);
-  border-color: var(--red-primary);
-  color: var(--gold);
+  background: linear-gradient(135deg, var(--poker-accent-deep), #7f1d1d);
+  border-color: var(--theme-accent-primary);
+  color: var(--poker-gold);
 }
 .btn-allin:hover:not(:disabled) { box-shadow: 0 0 20px rgba(220,38,38,0.5); }
 
@@ -571,22 +617,22 @@ body {
 }
 .raise-slider input[type="range"] {
   width: 120px;
-  accent-color: var(--red-primary);
+  accent-color: var(--theme-accent-primary);
 }
 .raise-amount {
   font-family: 'Share Tech Mono', monospace;
   font-size: 14px;
-  color: var(--gold);
+  color: var(--poker-gold);
   min-width: 50px;
   text-align: center;
 }
 
 .btn-new-hand {
   padding: 14px 32px;
-  background: linear-gradient(135deg, var(--red-deep), var(--red-primary));
-  border: 1px solid var(--red-primary);
+  background: linear-gradient(135deg, var(--poker-accent-deep), var(--theme-accent-primary));
+  border: 1px solid var(--theme-accent-primary);
   border-radius: 2px;
-  color: var(--text-primary);
+  color: var(--theme-text-primary);
   font-family: 'Orbitron', sans-serif;
   font-size: 13px;
   letter-spacing: 3px;
@@ -603,7 +649,7 @@ body {
   margin-top: 12px;
   padding: 12px;
   background: rgba(0,0,0,0.5);
-  border: 1px solid var(--red-dim);
+  border: 1px solid var(--theme-border-primary);
   border-radius: 2px;
   max-height: 100px;
   overflow-y: auto;
@@ -611,11 +657,11 @@ body {
 .log-entry {
   font-family: 'Share Tech Mono', monospace;
   font-size: 11px;
-  color: var(--text-dim);
+  color: var(--theme-text-muted);
   padding: 2px 0;
 }
-.log-entry.important { color: var(--gold); }
-.log-entry.action { color: var(--red-primary); }
+.log-entry.important { color: var(--poker-gold); }
+.log-entry.action { color: var(--theme-accent-primary); }
 
 /* ─── LEADERBOARD ─── */
 .leaderboard-page {
@@ -630,14 +676,14 @@ body {
   font-family: 'Orbitron', sans-serif;
   font-size: clamp(20px, 4vw, 32px);
   font-weight: 800;
-  color: var(--text-primary);
+  color: var(--theme-text-primary);
   text-align: center;
   margin-bottom: 8px;
   text-shadow: 0 0 20px rgba(220,38,38,0.3);
 }
 .lb-subtitle {
   font-size: 12px;
-  color: var(--text-dim);
+  color: var(--theme-text-muted);
   text-align: center;
   letter-spacing: 4px;
   text-transform: uppercase;
@@ -653,28 +699,28 @@ body {
   font-size: 10px;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--red-primary);
+  color: var(--theme-accent-primary);
   padding: 12px 8px;
   text-align: left;
-  border-bottom: 1px solid var(--red-dim);
+  border-bottom: 1px solid var(--theme-border-primary);
 }
 .lb-table td {
   font-family: 'Share Tech Mono', monospace;
   font-size: 13px;
   padding: 10px 8px;
-  border-bottom: 1px solid rgba(220,38,38,0.08);
-  color: var(--text-secondary);
+  border-bottom: 1px solid var(--theme-border-secondary);
+  color: var(--theme-text-secondary);
 }
 .lb-table tr:hover td { background: rgba(220,38,38,0.05); }
-.lb-rank { color: var(--gold); font-weight: 700; width: 40px; }
+.lb-rank { color: var(--poker-gold); font-weight: 700; width: 40px; }
 .lb-rank-1 { color: #ffd700; }
 .lb-rank-2 { color: #c0c0c0; }
 .lb-rank-3 { color: #cd7f32; }
-.lb-email { color: var(--text-primary); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lb-chips { color: var(--gold); }
+.lb-email { color: var(--theme-text-primary); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-chips { color: var(--poker-gold); }
 .lb-wins { color: #52b788; }
-.lb-you { background: rgba(220,38,38,0.08); }
-.lb-you td { color: var(--text-primary); }
+.lb-you { background: var(--theme-border-secondary); }
+.lb-you td { color: var(--theme-text-primary); }
 
 .lb-stats-grid {
   display: grid;
@@ -683,8 +729,8 @@ body {
   margin-bottom: 32px;
 }
 .stat-card {
-  background: rgba(17,17,17,0.8);
-  border: 1px solid var(--red-dim);
+  background: var(--theme-card-bg);
+  border: 1px solid var(--theme-border-primary);
   border-radius: 2px;
   padding: 16px;
   text-align: center;
@@ -693,13 +739,13 @@ body {
   font-family: 'Orbitron', sans-serif;
   font-size: 24px;
   font-weight: 700;
-  color: var(--gold);
+  color: var(--poker-gold);
 }
 .stat-label {
   font-size: 10px;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--text-dim);
+  color: var(--theme-text-muted);
   margin-top: 4px;
 }
 
@@ -717,13 +763,13 @@ body {
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .winner-box {
-  background: linear-gradient(135deg, #1a0505, #0a0a0a);
-  border: 2px solid var(--red-primary);
+  background: linear-gradient(135deg, #1a0505, var(--theme-bg-primary));
+  border: 2px solid var(--theme-accent-primary);
   border-radius: 4px;
   padding: 40px;
   text-align: center;
   max-width: 400px;
-  box-shadow: 0 0 60px rgba(220,38,38,0.3);
+  box-shadow: 0 0 60px var(--theme-accent-secondary);
   animation: popIn 0.4s ease;
 }
 @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -732,7 +778,7 @@ body {
   font-family: 'Orbitron', sans-serif;
   font-size: 14px;
   letter-spacing: 4px;
-  color: var(--red-primary);
+  color: var(--theme-accent-primary);
   text-transform: uppercase;
   margin-bottom: 12px;
 }
@@ -740,28 +786,28 @@ body {
   font-family: 'Orbitron', sans-serif;
   font-size: 24px;
   font-weight: 800;
-  color: var(--gold);
+  color: var(--poker-gold);
   text-shadow: 0 0 20px rgba(245,158,11,0.4);
   margin-bottom: 8px;
 }
 .winner-hand {
   font-family: 'Rajdhani', sans-serif;
   font-size: 16px;
-  color: var(--text-secondary);
+  color: var(--theme-text-secondary);
   margin-bottom: 16px;
 }
 .winner-chips {
   font-family: 'Share Tech Mono', monospace;
   font-size: 20px;
-  color: var(--gold);
+  color: var(--poker-gold);
   margin-bottom: 24px;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-dark); }
-::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--red-primary); }
+::-webkit-scrollbar-track { background: var(--theme-bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--theme-border-primary); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--theme-accent-primary); }
 
 /* Animations */
 @keyframes dealCard {
@@ -770,8 +816,7 @@ body {
 }
 .card-deal { animation: dealCard 0.3s ease forwards; }
 `;
-
-// ─── CARD COMPONENT ───
+ ───
 function Card({ card, small, faceDown, delay }) {
   if (!card && !faceDown) return null;
   const style = delay ? { animationDelay: `${delay}ms` } : {};
@@ -1245,7 +1290,7 @@ export default function PokerApp() {
         <div className="game-area">
           {!gameState ? (
             <div style={{ textAlign: 'center', marginTop: '80px' }}>
-              <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '14px', letterSpacing: '4px', color: 'var(--red-primary)', marginBottom: '24px', textTransform: 'uppercase' }}>
+              <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '14px', letterSpacing: '4px', color: 'var(--theme-accent-primary)', marginBottom: '24px', textTransform: 'uppercase' }}>
                 Ready to Battle?
               </div>
               <button className="btn-new-hand" onClick={dealNewHand}>Deal Hand</button>
@@ -1308,12 +1353,12 @@ export default function PokerApp() {
                 {/* Player */}
                 <div className="player-area">
                   <div className="player-info">
-                    <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '12px', color: gameState.isPlayerTurn ? 'var(--red-primary)' : 'var(--text-secondary)' }}>
+                    <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '12px', color: gameState.isPlayerTurn ? 'var(--theme-accent-primary)' : 'var(--theme-text-secondary)' }}>
                       {displayName} {gameState.playerFolded ? '(Folded)' : gameState.isPlayerTurn ? '⟨ Your Turn ⟩' : ''}
                     </span>
                     <span className="player-chip-count">⬣ {playerChips.toLocaleString()}</span>
                     {gameState.playerBet > 0 && (
-                      <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '12px', color: 'var(--red-primary)' }}>
+                      <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '12px', color: 'var(--theme-accent-primary)' }}>
                         Bet: {gameState.playerBet}
                       </span>
                     )}
@@ -1412,7 +1457,7 @@ export default function PokerApp() {
             </thead>
             <tbody>
               {leaderboard.length === 0 ? (
-                <tr><td colSpan={5} style={{ textAlign: 'center', padding: '24px', color: 'var(--text-dim)' }}>No warriors yet. Be the first.</td></tr>
+                <tr><td colSpan={5} style={{ textAlign: 'center', padding: '24px', color: 'var(--theme-text-muted)' }}>No warriors yet. Be the first.</td></tr>
               ) : leaderboard.map((p, i) => (
                 <tr key={p.email} className={p.email === email ? 'lb-you' : ''}>
                   <td className={`lb-rank ${i === 0 ? 'lb-rank-1' : i === 1 ? 'lb-rank-2' : i === 2 ? 'lb-rank-3' : ''}`}>{i + 1}</td>

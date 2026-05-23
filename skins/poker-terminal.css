@@ -1,0 +1,30 @@
+/* ═══════════════════════════════════════════════════════════
+   POKER SKIN — Terminal CRT (green-on-black)
+   ═══════════════════════════════════════════════════════════
+   Overrides the poker variable contract with the Terminal CRT
+   palette. Table felt becomes a dark green, accents turn neon
+   green, and gold is replaced by amber-green.
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --theme-bg-primary: #080808;
+  --theme-bg-secondary: #0a0a0a;
+  --theme-bg-tertiary: #0d0d0d;
+  --theme-card-bg: #0a0a0a;
+  --theme-text-primary: #22c55e;
+  --theme-text-secondary: #4ade80;
+  --theme-text-muted: #15803d;
+  --theme-accent-primary: #22c55e;
+  --theme-accent-secondary: #16a34a;
+  --theme-border-primary: rgba(34,197,94,0.25);
+  --theme-border-secondary: rgba(34,197,94,0.15);
+
+  --poker-felt: #0a1a0a;
+  --poker-felt-light: #0d2a0d;
+  --poker-accent-deep: #0f3d1a;
+  --poker-accent-dim: #166534;
+  --poker-circuit: rgba(34,197,94,0.12);
+  --poker-gold: #a3e635;
+  --poker-card-red: #22c55e;
+  --poker-card-black: #0a0a0a;
+}

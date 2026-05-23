@@ -1038,10 +1038,9 @@ export default function PokerApp() {
     if (!email.includes("@")) return;
     const name = email.split("@")[0];
     setDisplayName(name);
-    loadPlayerData(email).then(chips => {
-      setPlayerChips(chips);
-      setScreen("game");
-    });
+    const chips = loadPlayerData(email);
+    setPlayerChips(chips);
+    setScreen("game");
   }
 
   // ─── DEAL NEW HAND ───

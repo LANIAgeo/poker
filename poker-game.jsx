@@ -8,6 +8,34 @@ const AI_NAMES = ["Ronin_X","ShadowBlade","VoidWalker","CircuitSensei","NeonShog
 const STARTING_CHIPS = 1000;
 const SMALL_BLIND = 10;
 const BIG_BLIND = 20;
+
+// ─── MULTIPLAYER DETECTION ───
+let MP_TABLE_ID = "", MP_SEAT_INDEX = -1, MP_IS_HOST = false, MP_PLAYER_NAME = "";
+let MP_TOTAL_SEATS = 6, MP_STAKE = 0, MP_SMALL_BLIND = SMALL_BLIND, MP_BIG_BLIND = BIG_BLIND;
+let MP_PLAYERS = [];
+
+let isMultiplayer = false;
+if (typeof URLSearchParams !== "undefined") {
+  try { const p = new URLSearchParams(window.location.search); isMultiplayer = p.has("tableId"); } catch {}
+}
+if (isMultiplayer) {
+  const p = new URLSearchParams(window.location.search);
+  MP_TABLE_ID = p.get("tableId") || "";
+  MP_SEAT_INDEX = parseInt(p.get("seatIndex") || "0", 10);
+  MP_IS_HOST = p.get("isHost") === "1";
+  MP_PLAYER_NAME = p.get("playerName") || "";
+  MP_TOTAL_SEATS = parseInt(p.get("totalSeats") || "6", 10);
+  MP_STAKE = parseInt(p.get("stake") || "0", 10);
+  MP_SMALL_BLIND = parseInt(p.get("smallBlind") || String(SMALL_BLIND), 10);
+  MP_BIG_BLIND = parseInt(p.get("bigBlind") || String(BIG_BLIND), 10);
+}
+
+function postToParent(msg) {
+  if (typeof window !== "undefined" && window.parent && window.parent !== window) {
+    window.parent.postMessage(msg, "*");
+  }
+}
+
 // Simple obfuscation for PII in localStorage — not cryptographic, just avoids plaintext emails
 function hashEmail(em) {
   let h = 0;
@@ -893,6 +921,44 @@ export default function PokerApp() {
     loadSkinCSS(skin);
   }, []);
 
+  // Multiplayer: postMessage listener
+  useEffect(() => {
+    if (!isMultiplayer) return;
+    function onMsg(e) {
+      const d = e.data;
+      if (!d || typeof d !== "object") return;
+      switch (d.type) {
+        case "poker-init":
+          MP_TABLE_ID = d.tableId || MP_TABLE_ID;
+          MP_SEAT_INDEX = d.seatIndex != null ? d.seatIndex : MP_SEAT_INDEX;
+          MP_IS_HOST = Boolean(d.isHost);
+          MP_PLAYER_NAME = d.playerName || MP_PLAYER_NAME;
+          MP_TOTAL_SEATS = d.totalSeats || MP_TOTAL_SEATS;
+          MP_STAKE = d.stakeCredits || MP_STAKE;
+          MP_SMALL_BLIND = d.smallBlind || MP_SMALL_BLIND;
+          MP_BIG_BLIND = d.bigBlind || MP_BIG_BLIND;
+          MP_PLAYERS = d.players || [];
+          setDisplayName(MP_PLAYER_NAME);
+          setScreen("game");
+          break;
+        case "poker-state-sync":
+          if (d.gameState) setGameState(d.gameState);
+          if (d.playerChips != null) setPlayerChips(d.playerChips);
+          if (d.logs) setLogs(d.logs);
+          break;
+        case "poker-hand-result-broadcast":
+          if (d.results) setShowWinner(d.results);
+          break;
+        case "poker-table-update":
+          if (d.players) MP_PLAYERS = d.players;
+          break;
+      }
+    }
+    window.addEventListener("message", onMsg);
+    postToParent({ type: "poker-ready", tableId: MP_TABLE_ID });
+    return () => window.removeEventListener("message", onMsg);
+  }, []);
+
   // Load leaderboard
   useEffect(() => {
     loadLeaderboard();
@@ -981,43 +1047,51 @@ export default function PokerApp() {
   // ─── DEAL NEW HAND ───
   function dealNewHand() {
     if (aiTimerRef.current) clearTimeout(aiTimerRef.current);
-    
+    if (isMultiplayer && !MP_IS_HOST) return;
+    const sb = isMultiplayer ? MP_SMALL_BLIND : SMALL_BLIND;
+    const bb = isMultiplayer ? MP_BIG_BLIND : BIG_BLIND;
     const deck = createDeck();
-    const numAI = 3;
-    const aiPlayers = AI_NAMES.slice(0, numAI).map((name, i) => ({
-      name,
-      chips: 800 + Math.floor(Math.random() * 400),
-      hand: [deck.pop(), deck.pop()],
-      folded: false,
-      bet: 0,
-      allIn: false,
-    }));
+    let opponents;
+    if (isMultiplayer) {
+      opponents = [];
+      for (let i = 0; i < MP_TOTAL_SEATS; i++) {
+        if (i === MP_SEAT_INDEX) continue;
+        opponents.push({
+          name: MP_PLAYERS[i] || ("Player " + (i + 1)),
+          chips: STARTING_CHIPS,
+          hand: [deck.pop(), deck.pop()],
+          folded: false, bet: 0, allIn: false,
+          isHuman: true, seatIndex: i,
+        });
+      }
+    } else {
+      const numAI = 3;
+      opponents = AI_NAMES.slice(0, numAI).map((name) => ({
+      opponents = AI_NAMES.slice(0, numAI).map((name) => ({
+        name,
+        chips: 800 + Math.floor(Math.random() * 400),
+        hand: [deck.pop(), deck.pop()],
+        folded: false, bet: 0, allIn: false, isHuman: false,
+      }));
+    }
 
     const playerHand = [deck.pop(), deck.pop()];
     const communityCards = [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
 
-    // Post blinds
-    const totalPlayers = aiPlayers.length + 1;
-    const sbIdx = 0; // AI 0 is small blind
-    const bbIdx = 1; // AI 1 is big blind
-    
-    aiPlayers[sbIdx].chips -= SMALL_BLIND;
-    aiPlayers[sbIdx].bet = SMALL_BLIND;
-    aiPlayers[bbIdx].chips -= BIG_BLIND;
-    aiPlayers[bbIdx].bet = BIG_BLIND;
-
-    const newChips = playerChips;
+    const sbIdx = 0, bbIdx = 1;
+    if (opponents.length > sbIdx) { opponents[sbIdx].chips -= sb; opponents[sbIdx].bet = sb; }
+    if (opponents.length > bbIdx) { opponents[bbIdx].chips -= bb; opponents[bbIdx].bet = bb; }
 
     const state = {
       deck,
-      aiPlayers,
+      aiPlayers: opponents,
       playerHand,
       communityCards,
       revealedCommunity: 0,
-      pot: SMALL_BLIND + BIG_BLIND,
+      pot: sb + bb,
       playerBet: 0,
-      currentBet: BIG_BLIND,
-      phase: "preflop", // preflop, flop, turn, river, showdown
+      currentBet: bb,
+      phase: "preflop",
       playerFolded: false,
       playerAllIn: false,
       isPlayerTurn: true,
@@ -1025,11 +1099,11 @@ export default function PokerApp() {
     };
 
     setGameState(state);
-    setRaiseAmount(BIG_BLIND * 2);
+    setRaiseAmount(bb * 2);
     setLogs([]);
-    addLog(`New hand dealt. Blinds: ${SMALL_BLIND}/${BIG_BLIND}`, "important");
-    addLog(`${aiPlayers[sbIdx].name} posts small blind (${SMALL_BLIND})`);
-    addLog(`${aiPlayers[bbIdx].name} posts big blind (${BIG_BLIND})`);
+    addLog("New hand dealt. Blinds: " + sb + "/" + bb, "important");
+    if (opponents.length > sbIdx) addLog(opponents[sbIdx].name + " posts small blind (" + sb + ")");
+    if (opponents.length > bbIdx) addLog(opponents[bbIdx].name + " posts big blind (" + bb + ")");
     setShowWinner(null);
   }
 
@@ -1109,7 +1183,9 @@ export default function PokerApp() {
   // ─── AI LOGIC ───
   function runAIThenAdvance(state) {
     let s = { ...state, aiPlayers: state.aiPlayers.map(a => ({...a})) };
-    
+
+    if (isMultiplayer) { advancePhase(s); return; }
+
     for (let i = 0; i < s.aiPlayers.length; i++) {
       const ai = s.aiPlayers[i];
       if (ai.folded || ai.allIn || ai.chips <= 0) continue;
@@ -1266,23 +1342,51 @@ export default function PokerApp() {
         : stats.bestHand,
     };
     setStats(newStats);
-    savePlayerData(newChips, newStats);
-    updateLeaderboard(email, newChips, playerWon);
+    if (!isMultiplayer) {
+      savePlayerData(newChips, newStats);
+      updateLeaderboard(email, newChips, playerWon);
+    }
 
     const winnerName = winners.map(w => w.name).join(" & ");
     const handName = winners[0]?.eval?.name || "Unknown";
-    
+
     addLog(`${winnerName} wins ${winAmount} with ${handName}!`, "important");
 
-    // Show all cards at showdown
     setGameState(prev => ({...prev, handOver: true, revealedCommunity: 5}));
-    
+
     setShowWinner({
       name: winnerName,
       hand: handName,
       amount: winAmount,
       isPlayer: playerWon,
     });
+
+    if (isMultiplayer && MP_IS_HOST) {
+      const handResults = {
+        winner_seat_indexes: winners.map(w => {
+          if (w.isPlayer) return MP_SEAT_INDEX;
+          const opp = state.aiPlayers.find(a => a.name === w.name);
+          return opp ? opp.seatIndex : -1;
+        }).filter(i => i >= 0),
+        winning_hand_name: handName,
+        pot_chips: state.pot,
+        community_cards: state.communityCards,
+        player_hands: {
+          player: state.playerHand,
+          opponents: state.aiPlayers
+            .filter(a => !a.folded)
+            .map(a => ({ name: a.name, hand: a.hand })),
+        },
+      };
+      const handState = {
+        phase: state.phase, pot: state.pot, communityCards: state.communityCards,
+        aiPlayers: state.aiPlayers.map(a => ({
+          name: a.name, chips: a.chips, folded: a.folded,
+          bet: a.bet, allIn: a.allIn, seatIndex: a.seatIndex,
+        })),
+      };
+      postToParent({ type: "poker-hand-result", tableId: MP_TABLE_ID, handState, handResults });
+    }
   }
 
   // Cleanup timer on unmount
@@ -1291,7 +1395,7 @@ export default function PokerApp() {
   }, []);
 
   // ─── RENDER ───
-  if (screen === "login") {
+  if (screen === "login" && !isMultiplayer) {
     return (
       <div className="app-container">
         <style>{CSS}</style>
@@ -1334,7 +1438,7 @@ export default function PokerApp() {
 
       {/* NAV */}
       <div className="top-nav">
-        <div className="nav-brand">BR<span>@</span>INSTORM <span style={{fontSize:'10px',opacity:0.5}}>POKER</span></div>
+        <div className="nav-brand">BR<span>@</span>INSTORM <span style={{fontSize:'10px',opacity:0.5}}>POKER{isMultiplayer ? " MP" : ""}</span></div>
         <div className="nav-tabs">
           <button className={`nav-tab ${tab === 'game' ? 'active' : ''}`} onClick={() => setTab('game')}>Table</button>
           <button className={`nav-tab ${tab === 'leaderboard' ? 'active' : ''}`} onClick={() => { setTab('leaderboard'); loadLeaderboard(); }}>Ranks</button>
@@ -1342,7 +1446,7 @@ export default function PokerApp() {
         <div className="nav-user">
           <span className="nav-chips">⬣ {playerChips.toLocaleString()}</span>
           <span className="nav-email">{email}</span>
-          <button className="nav-logout" onClick={() => { setScreen('login'); setGameState(null); }}>Exit</button>
+          <button className="nav-logout" onClick={() => { if (isMultiplayer) { postToParent({ type: "poker-leave", tableId: MP_TABLE_ID }); } else { setScreen('login'); setGameState(null); } }}>{isMultiplayer ? "Leave" : "Exit"}</button>
         </div>
       </div>
 
@@ -1549,4 +1653,5 @@ export default function PokerApp() {
       )}
     </div>
   );
+}
 }

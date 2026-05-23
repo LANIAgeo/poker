@@ -8,6 +8,15 @@ const AI_NAMES = ["Ronin_X","ShadowBlade","VoidWalker","CircuitSensei","NeonShog
 const STARTING_CHIPS = 1000;
 const SMALL_BLIND = 10;
 const BIG_BLIND = 20;
+// Simple obfuscation for PII in localStorage — not cryptographic, just avoids plaintext emails
+function hashEmail(em) {
+  let h = 0;
+  for (let i = 0; i < em.length; i++) {
+    h = ((h << 5) - h + em.charCodeAt(i)) | 0;
+  }
+  return "p_" + Math.abs(h).toString(36);
+}
+
 
 // ─── CARD UTILITIES ───
 function createDeck() {
@@ -208,7 +217,7 @@ body {
 }
 
 .login-box {
-  background: linear-gradient(135deg, rgba(17,17,17,0.95), rgba(30,10,10,0.95));
+  background: linear-gradient(135deg, var(--theme-card-bg), var(--theme-bg-secondary));
   border: 1px solid var(--theme-border-primary);
   border-radius: 2px;
   padding: 40px;
@@ -247,7 +256,7 @@ body {
   outline: none;
   transition: border-color 0.3s;
 }
-.login-input:focus { border-color: var(--theme-accent-primary); box-shadow: 0 0 10px rgba(220,38,38,0.2); }
+.login-input:focus { border-color: var(--theme-accent-primary); box-shadow: 0 0 10px var(--theme-accent-primary); }
 .login-input::placeholder { color: var(--theme-text-muted); }
 
 .login-btn {
@@ -266,7 +275,7 @@ body {
   position: relative;
   overflow: hidden;
 }
-.login-btn:hover { box-shadow: 0 0 20px rgba(220,38,38,0.5); transform: translateY(-1px); }
+.login-btn:hover { box-shadow: 0 0 20px var(--theme-accent-secondary); transform: translateY(-1px); }
 .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ─── NAV ─── */
@@ -367,7 +376,7 @@ body {
   border-radius: 180px;
   padding: clamp(20px, 4vw, 40px) clamp(16px, 3vw, 30px);
   position: relative;
-  box-shadow: 0 0 40px rgba(220,38,38,0.15), inset 0 0 60px rgba(0,0,0,0.4);
+  box-shadow: 0 0 40px var(--theme-accent-primary), inset 0 0 60px rgba(0,0,0,0.4);
   margin: 16px 0;
 }
 .poker-table::before {
@@ -529,7 +538,7 @@ body {
 .card-face.black { color: var(--poker-card-black); }
 
 .card-back {
-  background: linear-gradient(135deg, var(--poker-accent-deep), #1a0505);
+  background: linear-gradient(135deg, var(--poker-accent-deep), var(--theme-bg-secondary));
   border: 1px solid var(--theme-border-primary);
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
@@ -601,14 +610,14 @@ body {
   border-color: var(--theme-accent-primary);
   color: var(--theme-accent-secondary);
 }
-.btn-raise:hover:not(:disabled) { background: rgba(120,20,20,0.6); box-shadow: 0 0 12px rgba(220,38,38,0.3); }
+.btn-raise:hover:not(:disabled) { background: rgba(120,20,20,0.6); box-shadow: 0 0 12px var(--theme-accent-primary); }
 
 .btn-allin {
-  background: linear-gradient(135deg, var(--poker-accent-deep), #7f1d1d);
+  background: linear-gradient(135deg, var(--poker-accent-deep), var(--poker-accent-dim));
   border-color: var(--theme-accent-primary);
   color: var(--poker-gold);
 }
-.btn-allin:hover:not(:disabled) { box-shadow: 0 0 20px rgba(220,38,38,0.5); }
+.btn-allin:hover:not(:disabled) { box-shadow: 0 0 20px var(--theme-accent-secondary); }
 
 .raise-slider {
   display: flex;
@@ -640,7 +649,7 @@ body {
   cursor: pointer;
   transition: all 0.3s;
 }
-.btn-new-hand:hover { box-shadow: 0 0 20px rgba(220,38,38,0.5); }
+.btn-new-hand:hover { box-shadow: 0 0 20px var(--theme-accent-secondary); }
 
 /* Game log */
 .game-log {
@@ -679,7 +688,7 @@ body {
   color: var(--theme-text-primary);
   text-align: center;
   margin-bottom: 8px;
-  text-shadow: 0 0 20px rgba(220,38,38,0.3);
+  text-shadow: 0 0 20px var(--theme-accent-primary);
 }
 .lb-subtitle {
   font-size: 12px;
@@ -711,7 +720,7 @@ body {
   border-bottom: 1px solid var(--theme-border-secondary);
   color: var(--theme-text-secondary);
 }
-.lb-table tr:hover td { background: rgba(220,38,38,0.05); }
+.lb-table tr:hover td { background: var(--theme-border-secondary); }
 .lb-rank { color: var(--poker-gold); font-weight: 700; width: 40px; }
 .lb-rank-1 { color: #ffd700; }
 .lb-rank-2 { color: #c0c0c0; }
@@ -763,13 +772,13 @@ body {
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .winner-box {
-  background: linear-gradient(135deg, #1a0505, var(--theme-bg-primary));
+  background: linear-gradient(135deg, var(--poker-accent-deep), var(--theme-bg-primary));
   border: 2px solid var(--theme-accent-primary);
   border-radius: 4px;
   padding: 40px;
   text-align: center;
   max-width: 400px;
-  box-shadow: 0 0 60px var(--theme-accent-secondary);
+  box-shadow: 0 0 60px var(--theme-accent-primary);
   animation: popIn 0.4s ease;
 }
 @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -816,6 +825,36 @@ body {
 }
 .card-deal { animation: dealCard 0.3s ease forwards; }
 `;
+// ─── SKIN LOADING ───
+const SKIN_MAP = {
+  default: null,
+  terminal: "skins/poker-terminal.css",
+  neotokyo: "skins/poker-neotokyo.css",
+  sakura: "skins/poker-sakura.css",
+  zen: "skins/poker-zen.css",
+  samurai: "skins/poker-samurai.css",
+};
+
+function getActiveSkin() {
+  if (typeof window === "undefined") return "default";
+  const params = new URLSearchParams(window.location.search);
+  return params.get("skin") || "default";
+}
+
+function loadSkinCSS(skinId) {
+  const path = SKIN_MAP[skinId];
+  if (!path) return;
+  const linkId = "poker-skin-link";
+  let link = document.getElementById(linkId);
+  if (!link) {
+    link = document.createElement("link");
+    link.id = linkId;
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+  }
+  link.href = path;
+}
+
 // ─── CARD COMPONENT ───
 function Card({ card, small, faceDown, delay }) {
   if (!card && !faceDown) return null;
@@ -848,6 +887,12 @@ export default function PokerApp() {
   const logRef = useRef(null);
   const aiTimerRef = useRef(null);
 
+  // Load skin from URL param
+  useEffect(() => {
+    const skin = getActiveSkin();
+    loadSkinCSS(skin);
+  }, []);
+
   // Load leaderboard
   useEffect(() => {
     loadLeaderboard();
@@ -860,13 +905,27 @@ export default function PokerApp() {
   function loadLeaderboard() {
     try {
       const raw = localStorage.getItem("poker-leaderboard");
-      if (raw) setLeaderboard(JSON.parse(raw));
+      if (raw) {
+        const lb = JSON.parse(raw);
+        // Backfill: migrate old plaintext-email entries to hashed
+        let migrated = false;
+        for (const entry of lb) {
+          if (entry.email && !entry.email.startsWith("p_")) {
+            entry.emailHash = hashEmail(entry.email);
+            entry.displayName = entry.displayName || entry.email.split("@")[0];
+            migrated = true;
+          }
+        }
+        if (migrated) localStorage.setItem("poker-leaderboard", JSON.stringify(lb));
+        setLeaderboard(lb);
+      }
     } catch (e) { /* no data yet */ }
   }
 
   function loadPlayerData(em) {
     try {
-      const raw = localStorage.getItem(`poker-player-${em}`);
+      const key = hashEmail(em);
+      const raw = localStorage.getItem(`poker-player-${key}`);
       if (raw) {
         const data = JSON.parse(raw);
         setPlayerChips(data.chips || STARTING_CHIPS);
@@ -879,22 +938,24 @@ export default function PokerApp() {
 
   function savePlayerData(chips, newStats) {
     try {
-      localStorage.setItem(`poker-player-${email}`, JSON.stringify({ chips, stats: newStats || stats, email }));
+      const key = hashEmail(email);
+      localStorage.setItem(`poker-player-${key}`, JSON.stringify({ chips, stats: newStats || stats, displayName }));
     } catch (e) { /* ignore */ }
   }
 
   function updateLeaderboard(em, chips, won) {
     try {
+      const emailHash = hashEmail(em);
       const raw = localStorage.getItem("poker-leaderboard");
       let lb = raw ? JSON.parse(raw) : [];
-      const idx = lb.findIndex(p => p.email === em);
+      const idx = lb.findIndex(p => p.emailHash === emailHash);
       if (idx >= 0) {
         lb[idx].chips = chips;
         lb[idx].handsPlayed = (lb[idx].handsPlayed || 0) + 1;
         if (won) lb[idx].handsWon = (lb[idx].handsWon || 0) + 1;
         lb[idx].lastSeen = Date.now();
       } else {
-        lb.push({ email: em, chips, handsPlayed: 1, handsWon: won ? 1 : 0, lastSeen: Date.now() });
+        lb.push({ emailHash, displayName: displayName || em.split("@")[0], chips, handsPlayed: 1, handsWon: won ? 1 : 0, lastSeen: Date.now() });
       }
       lb.sort((a,b) => b.chips - a.chips);
       localStorage.setItem("poker-leaderboard", JSON.stringify(lb));
@@ -1459,9 +1520,9 @@ export default function PokerApp() {
               {leaderboard.length === 0 ? (
                 <tr><td colSpan={5} style={{ textAlign: 'center', padding: '24px', color: 'var(--theme-text-muted)' }}>No warriors yet. Be the first.</td></tr>
               ) : leaderboard.map((p, i) => (
-                <tr key={p.email} className={p.email === email ? 'lb-you' : ''}>
+                <tr key={p.emailHash || p.email} className={(p.emailHash === hashEmail(email)) || p.email === email ? 'lb-you' : ''}>
                   <td className={`lb-rank ${i === 0 ? 'lb-rank-1' : i === 1 ? 'lb-rank-2' : i === 2 ? 'lb-rank-3' : ''}`}>{i + 1}</td>
-                  <td className="lb-email">{p.email.split("@")[0]}</td>
+                  <td className="lb-email">{p.displayName || (p.email ? p.email.split("@")[0] : "Unknown")}</td>
                   <td className="lb-chips">⬣ {(p.chips || 0).toLocaleString()}</td>
                   <td>{p.handsPlayed || 0}</td>
                   <td className="lb-wins">{p.handsWon || 0}</td>

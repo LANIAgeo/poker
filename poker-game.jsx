@@ -816,7 +816,7 @@ body {
 }
 .card-deal { animation: dealCard 0.3s ease forwards; }
 `;
- ───
+// ─── CARD COMPONENT ───
 function Card({ card, small, faceDown, delay }) {
   if (!card && !faceDown) return null;
   const style = delay ? { animationDelay: `${delay}ms` } : {};
@@ -857,18 +857,18 @@ export default function PokerApp() {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
   }, [logs]);
 
-  async function loadLeaderboard() {
+  function loadLeaderboard() {
     try {
-      const result = await window.storage.get("poker-leaderboard");
-      if (result) setLeaderboard(JSON.parse(result.value));
+      const raw = localStorage.getItem("poker-leaderboard");
+      if (raw) setLeaderboard(JSON.parse(raw));
     } catch (e) { /* no data yet */ }
   }
 
-  async function loadPlayerData(em) {
+  function loadPlayerData(em) {
     try {
-      const result = await window.storage.get(`poker-player-${em}`);
-      if (result) {
-        const data = JSON.parse(result.value);
+      const raw = localStorage.getItem(`poker-player-${em}`);
+      if (raw) {
+        const data = JSON.parse(raw);
         setPlayerChips(data.chips || STARTING_CHIPS);
         setStats(data.stats || { handsPlayed: 0, handsWon: 0, biggestPot: 0, bestHand: "None" });
         return data.chips || STARTING_CHIPS;
@@ -877,16 +877,16 @@ export default function PokerApp() {
     return STARTING_CHIPS;
   }
 
-  async function savePlayerData(chips, newStats) {
+  function savePlayerData(chips, newStats) {
     try {
-      await window.storage.set(`poker-player-${email}`, JSON.stringify({ chips, stats: newStats || stats, email }));
+      localStorage.setItem(`poker-player-${email}`, JSON.stringify({ chips, stats: newStats || stats, email }));
     } catch (e) { /* ignore */ }
   }
 
-  async function updateLeaderboard(em, chips, won) {
+  function updateLeaderboard(em, chips, won) {
     try {
-      const result = await window.storage.get("poker-leaderboard");
-      let lb = result ? JSON.parse(result.value) : [];
+      const raw = localStorage.getItem("poker-leaderboard");
+      let lb = raw ? JSON.parse(raw) : [];
       const idx = lb.findIndex(p => p.email === em);
       if (idx >= 0) {
         lb[idx].chips = chips;
@@ -897,7 +897,7 @@ export default function PokerApp() {
         lb.push({ email: em, chips, handsPlayed: 1, handsWon: won ? 1 : 0, lastSeen: Date.now() });
       }
       lb.sort((a,b) => b.chips - a.chips);
-      await window.storage.set("poker-leaderboard", JSON.stringify(lb));
+      localStorage.setItem("poker-leaderboard", JSON.stringify(lb));
       setLeaderboard(lb);
     } catch (e) { /* ignore */ }
   }
